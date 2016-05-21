@@ -246,8 +246,8 @@ class App:
 
 
 			# Same as above, starting with 0
-			for x in range(0,currentWidth):
-				for y in range(1,currentHeight):
+			for y in range(1,currentHeight):
+				for x in range(0,currentWidth):
 				
 					targetValue = int(secretPix[int(rgbIndex/3)%secretWidth, int(int(rgbIndex/3)/secretWidth)][rgbIndex%3] / factor)
 					
