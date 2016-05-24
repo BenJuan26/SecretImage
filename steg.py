@@ -176,6 +176,15 @@ class App:
 
 
 		elif self.useColour.get() == 1:
+
+			
+
+			if secretWidth * secretHeight > (currentWidth * currentHeight) / 3 + 8:
+				tkMessageBox.showinfo("Incompatible images!", "The secret image is too large. Try a smaller image " + \
+							"or not using colour.")
+				print "Secret image is bigger than target!"
+				return
+
 			print "Using colour..."
 
 			# This should be a multiple of 3, or weird things will happen below
@@ -196,9 +205,6 @@ class App:
 				widthMask[i] = 254 | widthBits[i]
 				heightMask[i] = 254 | heightBits[i]
 
-			#pix = currentPix[0,0]
-			#currentPix[0,0] = (pix[0] & widthMask[0] | widthBits[0], pix[1] & widthMask[1] | widthBits[1],\
-			#					pix[2] & widthMask[2] | widthBits[2])
 
 			# Encode size data in public image
 			for i in range(0, SIZE_BITS/3):
@@ -274,8 +280,8 @@ class App:
 				if int(rgbIndex/3) >= secretWidth * secretHeight:
 					break
 
-			print "Encoding is done?!"
-			print "rgbIndex is {}".format(rgbIndex)
+			print "Encoding is done."
+			#print "rgbIndex is {}".format(rgbIndex)
 			#print widthBits
 			#print heightBits
 
@@ -285,7 +291,7 @@ class App:
 		# refresh image in label
 		tkimage = ImageTk.PhotoImage(self.currentImage)
 		self.imageLabel.configure(image=tkimage)
-		self.imageLabel.image = tkimage # keep reference for tkimage version
+		self.imageLabel.image = tkimage # keep reference of tkimage version
 
 		print "Done encoding."
 		tkMessageBox.showinfo("Done Encoding", "Encoding is finished! Click Decode to view the "+\
@@ -349,19 +355,19 @@ class App:
 			index = 8
 			while index < currentWidth * currentHeight and secretIndex < secretWidth * secretHeight:
 
-				r = (pixels[index%currentWidth, int(index/currentWidth)][0] & 1) << 2
-				r += (pixels[index%currentWidth, int(index/currentWidth)][1] & 1) << 1
-				r += (pixels[index%currentWidth, int(index/currentWidth)][2] & 1)
+				r = (pixels[index%currentWidth, int(index/currentWidth)][0] & (2**numBits-1)) << (2*numBits)
+				r += (pixels[index%currentWidth, int(index/currentWidth)][1] & (2**numBits-1)) << numBits
+				r += (pixels[index%currentWidth, int(index/currentWidth)][2] & (2**numBits-1))
 				r = r * factor
 
-				g = (pixels[(index+1)%currentWidth, int((index+1)/currentWidth)][0] & 1) << 2
-				g += (pixels[(index+1)%currentWidth, int((index+1)/currentWidth)][1] & 1) << 1
-				g += (pixels[(index+1)%currentWidth, int((index+1)/currentWidth)][2] & 1)
+				g = (pixels[(index+1)%currentWidth, int((index+1)/currentWidth)][0] & (2**numBits-1)) << (2*numBits)
+				g += (pixels[(index+1)%currentWidth, int((index+1)/currentWidth)][1] & (2**numBits-1)) << numBits
+				g += (pixels[(index+1)%currentWidth, int((index+1)/currentWidth)][2] & (2**numBits-1))
 				g = g * factor
 
-				b = (pixels[(index+2)%currentWidth, int((index+2)/currentWidth)][0] & 1) << 2
-				b += (pixels[(index+2)%currentWidth, int((index+2)/currentWidth)][1] & 1) << 1
-				b += (pixels[(index+2)%currentWidth, int((index+2)/currentWidth)][2] & 1)
+				b = (pixels[(index+2)%currentWidth, int((index+2)/currentWidth)][0] & (2**numBits-1)) << 2*numBits
+				b += (pixels[(index+2)%currentWidth, int((index+2)/currentWidth)][1] & (2**numBits-1)) << numBits
+				b += (pixels[(index+2)%currentWidth, int((index+2)/currentWidth)][2] & (2**numBits-1))
 				b = b * factor
 
 				secretPix[secretIndex%secretWidth, int(secretIndex/secretWidth)] = (r,g,b)
